@@ -1,0 +1,27 @@
+{
+  "name": "chencc",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "workspaces": [
+    "cli"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "help": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chendj89/shop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chendj89/shop/issues"
+  },
+  "homepage": "https://github.com/chendj89/shop#readme",
+  "volta": {
+    "node": "16.17.0"
+  }
+}
