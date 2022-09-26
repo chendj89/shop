@@ -2,10 +2,7 @@
   "compilerOptions": {
     /* 基础配置 */
     "target": "esnext",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
+    "lib": ["dom", "esnext"],
     "removeComments": false,
     "declaration": true,
     "sourceMap": true,
@@ -18,9 +15,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

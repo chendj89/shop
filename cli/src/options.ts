@@ -1,0 +1,23 @@
+import path from "path";
+import { Option } from "commander";
+
+// 目录
+let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
+  .default(process.cwd())
+  .argParser((value: string) => {
+    if (value === ".") {
+      // 返回当前目录
+      return process.cwd();
+    } else {
+      if (value.startsWith("./")) {
+        return path.join(process.cwd(), value);
+      } else {
+        return value;
+      }
+    }
+  });
+// 端口
+let portOption = new Option("-p,--port <number>", "请输入端口号").default(8089);
+// 目录
+let rootOption = new Option("-r,--root <string>", "根目录").default("");
+export { dirOption, portOption, rootOption };
