@@ -42,7 +42,7 @@ let portOption = new Option("-p,--port <number>", "端口号").default(8089);
 // 目录
 let rootOption = new Option("-r,--root <string>", "根目录").default("");
 // 名称
-let nameOption = new Option("-n,--name <string>", "name").default("");
+let fromOption = new Option("-f,--from <string>", "仓库名").default("");
 // "-d 目录地址(default:'.')"
 let getOptionInfo = (option) => {
     if (option instanceof Array) {
@@ -220,23 +220,34 @@ async function userOption() {
     return await inquirer.prompt(list);
 }
 
+// https://www.colordrop.io/
+chalk.hex("#ff5c00");
+const blue = chalk.hex("#118DF0");
+const red = chalk.hex("#e41749");
+
 /**
  * 创建模板指令
  */
 const createCommand = new Command("create");
 createCommand
-    .description("创建模板" + getOptionInfo([dirOption, nameOption]))
+    .description("创建模板" + getOptionInfo([dirOption, fromOption]))
     .addOption(dirOption)
-    .addOption(nameOption)
+    .addOption(fromOption)
     .action((opts) => {
-    gitDownload({
-        repo: "chendj89/cli",
-        dest: opts.dir,
-        success: async () => {
-            let ans = await userOption();
-            return ans;
-        },
-    });
+    console.log(opts);
+    if (opts.from) {
+        gitDownload({
+            repo: opts.from,
+            dest: opts.dir,
+            success: async () => {
+                let ans = await userOption();
+                return ans;
+            },
+        });
+    }
+    else {
+        console.log(red(`需要仓库名，例如：cc create -f chendj89/cli`));
+    }
 });
 
 /**
@@ -250,11 +261,6 @@ rmCommand
     shell.rm("-rf", `${opts.dir}`);
     process.exit(1);
 });
-
-// https://www.colordrop.io/
-chalk.hex("#ff5c00");
-const blue = chalk.hex("#118DF0");
-const red = chalk.hex("#e41749");
 
 /**
  * 列表指令

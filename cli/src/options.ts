@@ -31,7 +31,7 @@ let portOption = new Option("-p,--port <number>", "端口号").default(8089);
 // 目录
 let rootOption = new Option("-r,--root <string>", "根目录").default("");
 // 名称
-let nameOption = new Option("-n,--name <string>", "name").default("");
+let fromOption = new Option("-f,--from <string>", "仓库名").default("");
 
 // "-d 目录地址(default:'.')"
 
@@ -56,6 +56,6 @@ export {
   dirOption,
   portOption,
   rootOption,
-  nameOption,
+  fromOption,
   getOptionInfo,
 };
