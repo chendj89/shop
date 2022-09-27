@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { dirOption } from "./options";
+import { dirOption, nameOption, getOptionInfo } from "./options";
 import gitDownload from "./gitdownload";
 import userOption from "./userOption";
 /**
@@ -8,8 +8,9 @@ import userOption from "./userOption";
 const createCommand = new Command("create");
 
 createCommand
-  .description(["创建模板", "-d 目录地址(default:'.')"].join("\n\t\t\t"))
+  .description("创建模板" + getOptionInfo([dirOption, nameOption]))
   .addOption(dirOption)
+  .addOption(nameOption)
   .action((opts) => {
     gitDownload({
       repo: "chendj89/cli",

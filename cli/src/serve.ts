@@ -4,7 +4,7 @@ import mime from "mime";
 // fs
 import fs from "fs-extra";
 import { Command } from "commander";
-import { dirOption, portOption, rootOption } from "./options";
+import { dirOption, portOption, rootOption,getOptionInfo } from "./options";
 /**
  * 静态服务器
  */
@@ -13,12 +13,7 @@ const serveCommand = new Command("serve");
 serveCommand
   .version("0.0.1")
   .description(
-    [
-      "静态服务器",
-      "-d 目录地址(default:'.')",
-      "-p 端口号(default:8089)",
-      "-r 根目录(default:'')",
-    ].join("\n\t\t\t")
+   "静态服务器"+getOptionInfo([dirOption,portOption,rootOption])
   )
   .addOption(dirOption)
   .addOption(portOption)

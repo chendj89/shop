@@ -12,8 +12,12 @@ import chalk from 'chalk';
 
 var version = "1.0.0";
 
+/**
+ * 连接符\n\t\t\t
+ */
+let lineFlag = `\n\t\t\t`;
 // 目录
-let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
+let dirOption = new Option("-d,--dir <string>", "资源目录")
     .default(process.cwd())
     .argParser((value) => {
     if (value === ".") {
@@ -34,9 +38,24 @@ let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
     }
 });
 // 端口
-let portOption = new Option("-p,--port <number>", "请输入端口号").default(8089);
+let portOption = new Option("-p,--port <number>", "端口号").default(8089);
 // 目录
 let rootOption = new Option("-r,--root <string>", "根目录").default("");
+// 名称
+let nameOption = new Option("-n,--name <string>", "name").default("");
+// "-d 目录地址(default:'.')"
+let getOptionInfo = (option) => {
+    if (option instanceof Array) {
+        return option.map((item) => {
+            return (lineFlag +
+                `${item.flags} ${item.description}(default:${item.defaultValue})`);
+        });
+    }
+    else {
+        return (lineFlag +
+            `${option.flags} ${option.description}(default:${option.defaultValue})`);
+    }
+};
 
 /**
  * 静态服务器
@@ -44,12 +63,7 @@ let rootOption = new Option("-r,--root <string>", "根目录").default("");
 const serveCommand = new Command("serve");
 serveCommand
     .version("0.0.1")
-    .description([
-    "静态服务器",
-    "-d 目录地址(default:'.')",
-    "-p 端口号(default:8089)",
-    "-r 根目录(default:'')",
-].join("\n\t\t\t"))
+    .description("静态服务器" + getOptionInfo([dirOption, portOption, rootOption]))
     .addOption(dirOption)
     .addOption(portOption)
     .addOption(rootOption)
@@ -148,7 +162,7 @@ async function gitDownload({ repo, message = "开始下载", dest, count = 1, su
             shell.rm("-rf", [`${temp}/.git`, `${temp}/package-lock.json`]);
             let et = dayjs();
             let dt = et.diff(st, "s");
-            loading.succeed(`下载成功(耗时:${dt}s)`);
+            loading.succeed(`👌下载成功(耗时:${dt}s)`);
             loading.stop();
             let ans = await success();
             if (ans) {
@@ -211,8 +225,9 @@ async function userOption() {
  */
 const createCommand = new Command("create");
 createCommand
-    .description(["创建模板", "-d 目录地址(default:'.')"].join("\n\t\t\t"))
+    .description("创建模板" + getOptionInfo([dirOption, nameOption]))
     .addOption(dirOption)
+    .addOption(nameOption)
     .action((opts) => {
     gitDownload({
         repo: "chendj89/cli",
@@ -244,7 +259,7 @@ const blue = chalk.hex("#118DF0");
  */
 const lsCommand = new Command("ls");
 lsCommand
-    .description("列表当前文件")
+    .description("列表当前文件:" + getOptionInfo(dirOption))
     .addOption(dirOption)
     .action((opts) => {
     if (fs.existsSync(opts.dir)) {

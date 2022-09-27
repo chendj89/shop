@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { dirOption } from "./options";
+import { dirOption, getOptionInfo } from "./options";
 import fs from "fs-extra";
 import { blue } from "./colors";
 /**
@@ -7,7 +7,7 @@ import { blue } from "./colors";
  */
 const lsCommand = new Command("ls");
 lsCommand
-  .description("列表当前文件")
+  .description("列表当前文件:" + getOptionInfo(dirOption))
   .addOption(dirOption)
   .action((opts) => {
     if (fs.existsSync(opts.dir)) {

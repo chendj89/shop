@@ -71,7 +71,7 @@ export default async function gitDownload({
         shell.rm("-rf", [`${temp}/.git`, `${temp}/package-lock.json`]);
         let et = dayjs();
         let dt = et.diff(st, "s");
-        loading.succeed(`下载成功(耗时:${dt}s)`);
+        loading.succeed(`👌下载成功(耗时:${dt}s)`);
         loading.stop();
         let ans = await success();
         if (ans) {
