@@ -8,6 +8,7 @@ import shell from 'shelljs';
 import ora from 'ora';
 import dayjs from 'dayjs';
 import inquirer from 'inquirer';
+import chalk from 'chalk';
 
 var version = "1.0.0";
 
@@ -24,6 +25,10 @@ let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
             return path.join(process.cwd(), value);
         }
         else {
+            const dir = path.join(process.cwd(), value);
+            if (fs.existsSync(dir)) {
+                return dir;
+            }
             return value;
         }
     }
@@ -201,6 +206,9 @@ async function userOption() {
     return await inquirer.prompt(list);
 }
 
+/**
+ * 创建模板指令
+ */
 const createCommand = new Command("create");
 createCommand
     .description(["创建模板", "-d 目录地址(default:'.')"].join("\n\t\t\t"))
@@ -216,7 +224,41 @@ createCommand
     });
 });
 
+/**
+ * 删除指令
+ */
+const rmCommand = new Command("rm");
+rmCommand
+    .description(["删除目录", "-d 目录地址(default:'.')"].join("\n\t\t\t"))
+    .addOption(dirOption)
+    .action((opts) => {
+    shell.rm("-rf", `${opts.dir}`);
+    process.exit(1);
+});
+
+chalk.hex("#ff5c00");
+const blue = chalk.hex("#118DF0");
+
+/**
+ * 列表指令
+ */
+const lsCommand = new Command("ls");
+lsCommand
+    .description("列表当前文件")
+    .addOption(dirOption)
+    .action((opts) => {
+    if (fs.existsSync(opts.dir)) {
+        const dirs = fs.readdirSync(opts.dir);
+        let values = Object.values(dirs);
+        console.log(blue(values));
+    }
+});
+
 const program = new Command();
-program.addCommand(serveCommand).addCommand(createCommand);
+program
+    .addCommand(serveCommand)
+    .addCommand(createCommand)
+    .addCommand(lsCommand)
+    .addCommand(rmCommand);
 program.version(version);
 program.parse(process.argv);

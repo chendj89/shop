@@ -27,6 +27,7 @@
     "@types/mime": "^3.0.1",
     "@types/node": "^18.7.21",
     "@types/shelljs": "^0.8.11",
+    "chalk": "^5.0.1",
     "commander": "^9.4.0",
     "dayjs": "^1.11.5",
     "fs-extra": "^10.1.0",

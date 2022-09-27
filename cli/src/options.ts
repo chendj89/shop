@@ -1,5 +1,6 @@
 import path from "path";
 import { Option } from "commander";
+import fs from "fs-extra";
 
 // 目录
 let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
@@ -12,6 +13,10 @@ let dirOption = new Option("-d,--dir <string>", "请输入资源目录")
       if (value.startsWith("./")) {
         return path.join(process.cwd(), value);
       } else {
+        const dir = path.join(process.cwd(), value);
+        if (fs.existsSync(dir)) {
+          return dir;
+        }
         return value;
       }
     }
