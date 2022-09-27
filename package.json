@@ -8,7 +8,8 @@
   ],
   "main": "index.js",
   "scripts": {
-    "help": ""
+    "help": "",
+    "preinstall": "npx please-use-yarn"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
   "homepage": "https://github.com/chendj89/shop#readme",
   "volta": {
     "node": "16.17.0"
+  },
+  "engines": {
+    "yarn": ">=1.22.19"
   }
 }
