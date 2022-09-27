@@ -2,6 +2,9 @@ import { Command } from "commander";
 import { dirOption } from "./options";
 import gitDownload from "./gitdownload";
 import userOption from "./userOption";
+/**
+ * 创建模板指令
+ */
 const createCommand = new Command("create");
 
 createCommand

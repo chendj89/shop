@@ -1,7 +1,6 @@
 ### shop
 
-##### Yarn Workspace 使用指南
-[1]
+##### Yarn Workspace 使用指南<sup>[1]</sup>
 
 - `"private": true` Workspace 才会生效
 - 其中`"packages/*"`是社区的常见写法，也可以枚举所有`package： "workspaces": ["package-a", "package-b"]`
