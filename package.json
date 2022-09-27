@@ -8,8 +8,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "help": "",
-    "preinstall": "npx please-use-yarn"
+    "help": ""
   },
   "repository": {
     "type": "git",
