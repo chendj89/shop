@@ -251,8 +251,10 @@ rmCommand
     process.exit(1);
 });
 
+// https://www.colordrop.io/
 chalk.hex("#ff5c00");
 const blue = chalk.hex("#118DF0");
+const red = chalk.hex("#e41749");
 
 /**
  * 列表指令
@@ -265,8 +267,14 @@ lsCommand
     if (fs.existsSync(opts.dir)) {
         const dirs = fs.readdirSync(opts.dir);
         let values = Object.values(dirs);
-        console.log(blue(values));
+        if (values.length) {
+            console.log(blue(values));
+        }
+        else {
+            console.log(red("无"));
+        }
     }
+    process.exit(1);
 });
 
 const program = new Command();
