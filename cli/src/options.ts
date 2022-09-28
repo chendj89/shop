@@ -15,13 +15,11 @@ let dirOption = new Option("-d,--dir <string>", "资源目录")
       // 返回当前目录
       return process.cwd();
     } else {
-      if (value.startsWith("./")) {
-        return path.join(process.cwd(), value);
+      let dir = path.join(process.cwd(), value);
+      // 判断相对目录是否存在-子目录、相对目录
+      if (fs.existsSync(dir)) {
+        return dir;
       } else {
-        const dir = path.join(process.cwd(), value);
-        if (fs.existsSync(dir)) {
-          return dir;
-        }
         return value;
       }
     }

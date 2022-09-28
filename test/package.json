@@ -1,0 +1,34 @@
+{
+  "name": "@chencc/gitdownload",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "publish": "npm publish --otp "
+  },
+  "devDependencies": {
+    "shelljs": "^0.8.5",
+    "ora": "^6.1.2",
+    "dayjs": "^1.11.5",
+    "fs-extra": "^10.1.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./",
+  "module": "./dist/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chendj89/gitdownload.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repo": "gitdownload"
+}

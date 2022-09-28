@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { dirOption, fromOption, getOptionInfo } from "./options";
 import gitDownload from "./gitdownload";
-import userOption from "./userOption";
+import { userInquirer } from "./inquirer";
 import { red } from "./colors";
 /**
  * 创建模板指令
@@ -18,12 +18,12 @@ createCommand
         repo: opts.from,
         dest: opts.dir,
         success: async () => {
-          let ans = await userOption();
+          let ans = await userInquirer();
           return ans;
         },
       });
-    }else {
-      console.log(red(`需要仓库名，例如：cc create -f chendj89/cli`))
+    } else {
+      console.log(red(`需要仓库名，例如：cc create -f chendj89/cli`));
     }
   });
 

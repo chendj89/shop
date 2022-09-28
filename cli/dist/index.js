@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-var version = "1.0.0";
+var version$1 = "1.0.0";
 
 /**
  * 连接符\n\t\t\t
@@ -25,14 +25,12 @@ let dirOption = new Option("-d,--dir <string>", "资源目录")
         return process.cwd();
     }
     else {
-        if (value.startsWith("./")) {
-            return path.join(process.cwd(), value);
+        let dir = path.join(process.cwd(), value);
+        // 判断相对目录是否存在-子目录、相对目录
+        if (fs.existsSync(dir)) {
+            return dir;
         }
         else {
-            const dir = path.join(process.cwd(), value);
-            if (fs.existsSync(dir)) {
-                return dir;
-            }
             return value;
         }
     }
@@ -217,11 +215,54 @@ let list = [
         type: "input",
         name: "version",
         message: "版本号:",
-        default: "1.0.0"
+        default: "1.0.0",
     },
 ];
-async function userOption() {
+const publish = [
+    {
+        type: "list",
+        message: "请选择发布项目:",
+        name: "repo",
+        askAnswered: true,
+        choices: ["gitdownload", "cli"],
+    },
+    {
+        type: "input",
+        name: "version",
+        message: "版本号:",
+        default: "1.0.0",
+    },
+    {
+        type: "input",
+        name: "type",
+        message: "模式:",
+        default: "module",
+    },
+    {
+        type: "input",
+        name: "scripts",
+        message: "npm上传:",
+        default: "",
+    },
+];
+async function userInquirer() {
     return await inquirer.prompt(list);
+}
+async function publishInquirer() {
+    return await inquirer.prompt(publish).then((ans) => {
+        if (ans.repo == "gitdownload") {
+            ans.devDependencies = {
+                shelljs: "^0.8.5",
+                ora: "^6.1.2",
+                dayjs: "^1.11.5",
+                "fs-extra": "^10.1.0",
+            };
+            ans.scripts = {
+                publish: `npm publish --otp ${ans.scripts}`,
+            };
+        }
+        return ans;
+    });
 }
 
 // https://www.colordrop.io/
@@ -243,7 +284,7 @@ createCommand
             repo: opts.from,
             dest: opts.dir,
             success: async () => {
-                let ans = await userOption();
+                let ans = await userInquirer();
                 return ans;
             },
         });
@@ -286,11 +327,87 @@ lsCommand
     process.exit(1);
 });
 
+var name = "";
+var version = "";
+var type = "";
+var scripts = {
+};
+var devDependencies = {
+};
+var files = [
+	"dist"
+];
+var main = "./dist/index.js";
+var module = "./dist/index.js";
+var types = "./dist/src/index.d.ts";
+var exports = {
+	".": {
+		"import": "./dist/index.es.js"
+	}
+};
+var repository = {
+	type: "git",
+	url: ""
+};
+var publishConfig = {
+	access: "public",
+	registry: "https://registry.npmjs.org/"
+};
+var publishPkg = {
+	name: name,
+	version: version,
+	type: type,
+	scripts: scripts,
+	devDependencies: devDependencies,
+	files: files,
+	main: main,
+	module: module,
+	types: types,
+	exports: exports,
+	repository: repository,
+	publishConfig: publishConfig
+};
+
+/**
+ * 列表指令
+ */
+const publishCommand = new Command("publish");
+publishCommand
+    .description("发布版本:" + getOptionInfo([dirOption]))
+    .addOption(dirOption)
+    .action(async (opts) => {
+    let join = (str) => {
+        return path.join(opts.dir, str);
+    };
+    let ans = await publishInquirer();
+    let option = {
+        ...ans,
+        name: `@chencc/${ans.repo}`,
+        main: "./",
+        repository: {
+            type: "git",
+            url: `https://github.com/chendj89/${ans.repo}.git`,
+        },
+    };
+    Object.assign(publishPkg, option);
+    shell.rm("-rf", join(""));
+    shell.mkdir([join(""), join("/dist")]);
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.js"), join("/dist/gitdownload.js"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/src/gitdownload.d.ts"), join("/dist/gitdownload.d.ts"));
+    fs.writeFileSync(join("/package.json"), JSON.stringify(publishPkg, null, 2), "utf-8");
+    setTimeout(() => {
+        console.log(option.scripts.publish);
+        shell.cd(opts.dir);
+        shell.exec("npm publish");
+    }, 1000);
+});
+
 const program = new Command();
 program
     .addCommand(serveCommand)
     .addCommand(createCommand)
     .addCommand(lsCommand)
+    .addCommand(publishCommand)
     .addCommand(rmCommand);
-program.version(version);
+program.version(version$1);
 program.parse(process.argv);
