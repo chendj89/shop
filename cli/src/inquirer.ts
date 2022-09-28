@@ -55,14 +55,11 @@ export async function userInquirer() {
 export async function publishInquirer() {
   return await inquirer.prompt(publish).then((ans) => {
     if (ans.repo == "gitdownload") {
-      ans.devDependencies = {
+      ans.dependencies = {
         shelljs: "^0.8.5",
         ora: "^6.1.2",
         dayjs: "^1.11.5",
         "fs-extra": "^10.1.0",
-      };
-      ans.scripts = {
-        publish: `npm publish --otp ${ans.scripts}`,
       };
     }
     return ans;

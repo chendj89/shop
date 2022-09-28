@@ -251,14 +251,11 @@ async function userInquirer() {
 async function publishInquirer() {
     return await inquirer.prompt(publish).then((ans) => {
         if (ans.repo == "gitdownload") {
-            ans.devDependencies = {
+            ans.dependencies = {
                 shelljs: "^0.8.5",
                 ora: "^6.1.2",
                 dayjs: "^1.11.5",
                 "fs-extra": "^10.1.0",
-            };
-            ans.scripts = {
-                publish: `npm publish --otp ${ans.scripts}`,
             };
         }
         return ans;
@@ -339,10 +336,11 @@ var files = [
 ];
 var main = "./dist/index.js";
 var module = "./dist/index.js";
-var types = "./dist/src/index.d.ts";
+var types = "./dist/index.d.ts";
 var exports = {
 	".": {
-		"import": "./dist/index.es.js"
+		"import": "./dist/index.js",
+		exports: "./dist/index.js"
 	}
 };
 var repository = {
@@ -392,14 +390,10 @@ publishCommand
     Object.assign(publishPkg, option);
     shell.rm("-rf", join(""));
     shell.mkdir([join(""), join("/dist")]);
-    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.js"), join("/dist/gitdownload.js"));
-    shell.cp("-f", path.join(process.cwd(), "cli/dist/src/gitdownload.d.ts"), join("/dist/gitdownload.d.ts"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.cjs.js"), join("/dist/index.js"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/src/gitdownload.d.ts"), join("/dist/index.d.ts"));
     fs.writeFileSync(join("/package.json"), JSON.stringify(publishPkg, null, 2), "utf-8");
-    setTimeout(() => {
-        console.log(option.scripts.publish);
-        shell.cd(opts.dir);
-        shell.exec("npm publish");
-    }, 1000);
+    process.exit(1);
 });
 
 const program = new Command();

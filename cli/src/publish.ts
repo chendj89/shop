@@ -31,25 +31,19 @@ publishCommand
     shell.mkdir([join(""), join("/dist")]);
     shell.cp(
       "-f",
-      path.join(process.cwd(), "cli/dist/gitdownload.js"),
-      join("/dist/gitdownload.js")
+      path.join(process.cwd(), "cli/dist/gitdownload.cjs.js"),
+      join("/dist/index.js")
     );
     shell.cp(
       "-f",
       path.join(process.cwd(), "cli/dist/src/gitdownload.d.ts"),
-      join("/dist/gitdownload.d.ts")
+      join("/dist/index.d.ts")
     );
     fs.writeFileSync(
       join("/package.json"),
       JSON.stringify(publishPkg, null, 2),
       "utf-8"
     );
-
-    setTimeout(() => {
-      console.log(option.scripts.publish);
-
-      shell.cd(opts.dir);
-      shell.exec("npm publish");
-    }, 1000);
+    process.exit(1);
   });
 export default publishCommand;

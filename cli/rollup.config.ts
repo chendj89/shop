@@ -25,4 +25,14 @@ export default defineConfig([
     external: ["http", "path", "mime", "fs", "commander"],
     plugins: [json(), tsc()],
   },
+  {
+    input: "./src/gitdownload.ts",
+    output: {
+      file: "dist/gitdownload.cjs.js",
+      format: "cjs",
+      exports: "default",
+    },
+    external: ["http", "path", "mime", "fs", "commander"],
+    plugins: [json(), tsc()],
+  },
 ]);
