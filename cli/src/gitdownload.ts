@@ -10,6 +10,7 @@ import path from "path";
  * @param {string} opts.message 下载提示消息 "开始下载"
  * @param {string} opts.dest 存放目录 当前目录
  * @param {number} opts.count 失败后，尝试下载次数 1
+ * @param {array} opts.ignore 不想要的文件或者目录 [".git","package-lock.json"]
  * @param {Function} opts.success 下载成功后的回调函数
  */
 export default async function gitDownload({
@@ -18,6 +19,7 @@ export default async function gitDownload({
   dest,
   count = 1,
   success = () => {},
+  ignore = [".git", "package-lock.json"],
   startTime,
 }: {
   /**
@@ -36,6 +38,10 @@ export default async function gitDownload({
    * 重复下载次数
    */
   count?: number;
+  /**
+   * 不想要的文件或者目录
+   */
+  ignore?: string[];
   /**
    * 成功下载后回调函数
    */
@@ -68,7 +74,10 @@ export default async function gitDownload({
     },
     async (code) => {
       if (code === 0) {
-        shell.rm("-rf", [`${temp}/.git`, `${temp}/package-lock.json`]);
+        const tempIgnore = ignore.map((item) => {
+          return path.join(temp, item);
+        });
+        shell.rm("-rf", tempIgnore);
         let et = dayjs();
         let dt = et.diff(st, "s");
         loading.succeed(`👌下载成功(耗时:${dt}s)`);

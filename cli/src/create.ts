@@ -13,7 +13,6 @@ createCommand
   .addOption(dirOption)
   .addOption(fromOption)
   .action((opts) => {
-    console.log(opts);
     if (opts.from) {
       gitDownload({
         repo: opts.from,

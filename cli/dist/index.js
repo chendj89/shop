@@ -136,9 +136,10 @@ async function readStaticFile(filePathName) {
  * @param {string} opts.message 下载提示消息 "开始下载"
  * @param {string} opts.dest 存放目录 当前目录
  * @param {number} opts.count 失败后，尝试下载次数 1
+ * @param {array} opts.ignore 不想要的文件或者目录 [".git","package-lock.json"]
  * @param {Function} opts.success 下载成功后的回调函数
  */
-async function gitDownload({ repo, message = "开始下载", dest, count = 1, success = () => { }, startTime, }) {
+async function gitDownload({ repo, message = "开始下载", dest, count = 1, success = () => { }, ignore = [".git", "package-lock.json"], startTime, }) {
     let temp = repo.split("/")[1];
     // 当前进度条的颜色
     let colors = ["red", "green", "yellow"];
@@ -159,7 +160,10 @@ async function gitDownload({ repo, message = "开始下载", dest, count = 1, su
         async: true,
     }, async (code) => {
         if (code === 0) {
-            shell.rm("-rf", [`${temp}/.git`, `${temp}/package-lock.json`]);
+            const tempIgnore = ignore.map((item) => {
+                return path.join(temp, item);
+            });
+            shell.rm("-rf", tempIgnore);
             let et = dayjs();
             let dt = et.diff(st, "s");
             loading.succeed(`👌下载成功(耗时:${dt}s)`);
@@ -234,7 +238,6 @@ createCommand
     .addOption(dirOption)
     .addOption(fromOption)
     .action((opts) => {
-    console.log(opts);
     if (opts.from) {
         gitDownload({
             repo: opts.from,
