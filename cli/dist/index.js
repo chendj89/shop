@@ -5,7 +5,6 @@ import path from 'path';
 import mime from 'mime';
 import fs from 'fs-extra';
 import shell from 'shelljs';
-import ora from 'ora';
 import dayjs from 'dayjs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -127,6 +126,52 @@ async function readStaticFile(filePathName) {
     };
 }
 
+let MOVE_LEFT = Buffer.from("1b5b3130303044", "hex").toString();
+let MOVE_UP = Buffer.from("1b5b3141", "hex").toString();
+let CLEAR_LINE = Buffer.from("1b5b304b", "hex").toString();
+let stringWidth = (str) => str;
+function lineLog(stream) {
+    let write = stream.write;
+    let str;
+    stream.write = function (data) {
+        if (str && data !== str)
+            str = null;
+        return write.apply(this, arguments);
+    };
+    if (stream === process.stderr || stream === process.stdout) {
+        process.on("exit", function () {
+            if (str !== null)
+                stream.write("");
+        });
+    }
+    let prevLineCount = 0;
+    let log = function () {
+        str = "";
+        let nextStr = Array.prototype.join.call(arguments, " ");
+        // Clear screen
+        for (let i = 0; i < prevLineCount; i++) {
+            str += MOVE_LEFT + CLEAR_LINE + (i < prevLineCount - 1 ? MOVE_UP : "");
+        }
+        // Actual log output
+        str += nextStr;
+        stream.write(str);
+        // How many lines to remove on next clear screen
+        let prevLines = nextStr.split("\n");
+        prevLineCount = 0;
+        for (let i = 0; i < prevLines.length; i++) {
+            prevLineCount +=
+                Math.ceil(stringWidth(prevLines[i]) / stream.columns) || 1;
+        }
+    };
+    log.clear = function () {
+        stream.write("");
+    };
+    return log;
+}
+let stdout = lineLog(process.stdout);
+lineLog(process.stderr);
+
+let frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 /**
  * 下载github仓库
  * @param {*} opts 对象参数
@@ -140,18 +185,23 @@ async function readStaticFile(filePathName) {
 async function gitDownload({ repo, message = "开始下载", dest, count = 1, success = () => { }, ignore = [".git", "package-lock.json"], startTime, }) {
     let temp = repo.split("/")[1];
     // 当前进度条的颜色
-    let colors = ["red", "green", "yellow"];
+    // let colors: Color[] = ["red", "green", "yellow"];
     // 开始时间
     let st = dayjs();
-    let loading = ora({
-        spinner: {
-            interval: 80,
-            frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
-        },
-    });
-    loading.color = colors[count % 3];
-    loading.text = message;
-    loading.start();
+    // let loading = ora({
+    //   spinner: {
+    //     interval: 80,
+    //     frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+    //   },
+    // });
+    stdout(message);
+    let i = 0;
+    setInterval(() => {
+        stdout(frames[i % 9] + "  " + message);
+    }, 80);
+    // loading.color = colors[count % 3];
+    // loading.text = message;
+    // loading.start();
     // 删除下载的目录
     shell.rm("-rf", temp);
     shell.exec(`git clone --depth=1 https://github.com/${repo}.git`, {
@@ -164,8 +214,9 @@ async function gitDownload({ repo, message = "开始下载", dest, count = 1, su
             shell.rm("-rf", tempIgnore);
             let et = dayjs();
             let dt = et.diff(st, "s");
-            loading.succeed(`👌下载成功(耗时:${dt}s)`);
-            loading.stop();
+            stdout(`👌下载成功(耗时:${dt}s)`);
+            // loading.succeed();
+            // loading.stop();
             let ans = await success();
             if (ans) {
                 let pkg = path.join(process.cwd(), temp, "package.json");
@@ -183,7 +234,7 @@ async function gitDownload({ repo, message = "开始下载", dest, count = 1, su
         }
         else {
             // 下载失败
-            loading.stop();
+            // loading.stop();
             count--;
             if (count <= 0) {
                 process.exit(1);
@@ -326,7 +377,6 @@ lsCommand
 
 var name = "";
 var version = "";
-var type = "";
 var scripts = {
 };
 var devDependencies = {
@@ -334,13 +384,17 @@ var devDependencies = {
 var files = [
 	"dist"
 ];
-var main = "./dist/index.js";
-var module = "./dist/index.js";
-var types = "./dist/index.d.ts";
+var type = "module";
+var description = "";
+var main = "dist/index.js";
+var module = "dist/index.mjs";
+var types = "dist/index.d.ts";
 var exports = {
+	"./*": "./*",
 	".": {
-		"import": "./dist/index.js",
-		exports: "./dist/index.js"
+		browser: "./dist/index.module.js",
+		"import": "./dist/index.mjs",
+		require: "./dist/index.js"
 	}
 };
 var repository = {
@@ -354,10 +408,11 @@ var publishConfig = {
 var publishPkg = {
 	name: name,
 	version: version,
-	type: type,
 	scripts: scripts,
 	devDependencies: devDependencies,
 	files: files,
+	type: type,
+	description: description,
 	main: main,
 	module: module,
 	types: types,
@@ -390,7 +445,9 @@ publishCommand
     Object.assign(publishPkg, option);
     shell.rm("-rf", join(""));
     shell.mkdir([join(""), join("/dist")]);
-    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.cjs.js"), join("/dist/index.js"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.js"), join("/dist/index.js"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.mjs"), join("/dist/index.mjs"));
+    shell.cp("-f", path.join(process.cwd(), "cli/dist/gitdownload.module.js"), join("/dist/index.module.js"));
     shell.cp("-f", path.join(process.cwd(), "cli/dist/src/gitdownload.d.ts"), join("/dist/index.d.ts"));
     fs.writeFileSync(join("/package.json"), JSON.stringify(publishPkg, null, 2), "utf-8");
     process.exit(1);

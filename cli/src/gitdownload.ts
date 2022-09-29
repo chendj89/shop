@@ -1,8 +1,10 @@
 import shell from "shelljs";
-import ora, { Color } from "ora";
+// import ora, { Color } from "ora";
+import {stdout} from "./log";
 import dayjs, { Dayjs } from "dayjs";
 import fs from "fs-extra";
 import path from "path";
+let frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 /**
  * 下载github仓库
  * @param {*} opts 对象参数
@@ -53,18 +55,23 @@ export default async function gitDownload({
 }) {
   let temp: string = repo.split("/")[1];
   // 当前进度条的颜色
-  let colors: Color[] = ["red", "green", "yellow"];
+  // let colors: Color[] = ["red", "green", "yellow"];
   // 开始时间
   let st = dayjs();
-  let loading = ora({
-    spinner: {
-      interval: 80,
-      frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
-    },
-  });
-  loading.color = colors[count % 3];
-  loading.text = message;
-  loading.start();
+  // let loading = ora({
+  //   spinner: {
+  //     interval: 80,
+  //     frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+  //   },
+  // });
+  stdout(message);
+  let i=0;
+  setInterval(() => {
+    stdout(frames[i%9]+"  "+message)
+  }, 80);
+  // loading.color = colors[count % 3];
+  // loading.text = message;
+  // loading.start();
   // 删除下载的目录
   shell.rm("-rf", temp);
   shell.exec(
@@ -80,8 +87,9 @@ export default async function gitDownload({
         shell.rm("-rf", tempIgnore);
         let et = dayjs();
         let dt = et.diff(st, "s");
-        loading.succeed(`👌下载成功(耗时:${dt}s)`);
-        loading.stop();
+        stdout(`👌下载成功(耗时:${dt}s)`);
+        // loading.succeed();
+        // loading.stop();
         let ans = await success();
         if (ans) {
           let pkg = path.join(process.cwd(), temp, "package.json");
@@ -98,7 +106,7 @@ export default async function gitDownload({
         process.exit(1);
       } else {
         // 下载失败
-        loading.stop();
+        // loading.stop();
         count--;
         if (count <= 0) {
           process.exit(1);

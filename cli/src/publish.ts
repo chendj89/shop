@@ -31,8 +31,18 @@ publishCommand
     shell.mkdir([join(""), join("/dist")]);
     shell.cp(
       "-f",
-      path.join(process.cwd(), "cli/dist/gitdownload.cjs.js"),
+      path.join(process.cwd(), "cli/dist/gitdownload.js"),
       join("/dist/index.js")
+    );
+    shell.cp(
+      "-f",
+      path.join(process.cwd(), "cli/dist/gitdownload.mjs"),
+      join("/dist/index.mjs")
+    );
+    shell.cp(
+      "-f",
+      path.join(process.cwd(), "cli/dist/gitdownload.module.js"),
+      join("/dist/index.module.js")
     );
     shell.cp(
       "-f",

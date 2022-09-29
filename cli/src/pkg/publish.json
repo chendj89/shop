@@ -1,20 +1,23 @@
 {
   "name": "",
   "version": "",
-  "type": "",
-  "scripts": {
-  },
+  "scripts": {},
   "devDependencies": {},
   "files": ["dist"],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "type": "module",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
+    "./*": "./*",
     ".": {
-      "import": "./dist/index.js",
-      "exports":"./dist/index.js"
+      "browser": "./dist/index.module.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
+
   "repository": {
     "type": "git",
     "url": ""
